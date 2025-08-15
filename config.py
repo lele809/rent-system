@@ -18,8 +18,9 @@ class Config:
         # 如果有DATABASE_URL环境变量，直接使用
         SQLALCHEMY_DATABASE_URI = DATABASE_URL
     else:
-        # 在serverless环境中使用内存数据库
-        SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+        # 在本地开发环境中使用SQLite文件数据库
+        # 在生产环境中建议配置DATABASE_URL环境变量
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///rental_system.db'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PER_PAGE = 10
