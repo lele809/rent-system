@@ -3001,11 +3001,21 @@ def api_delete_admin(admin_id):
         return jsonify({'success': False, 'message': f'删除失败: {str(e)}'})
 
 
-# Vercel部署需要的应用实例
-app_instance = app
+# Vercel 部署时的应用初始化
+def init_app_for_vercel():
+    """为 Vercel 部署初始化应用"""
+    try:
+        with app.app_context():
+            # 在 Vercel 环境中初始化数据库
+            db.create_all()
+            print("数据库初始化成功")
+    except Exception as e:
+        print(f"数据库初始化失败: {e}")
 
-# 在Vercel环境中初始化数据库
-init_database()
+# 检查是否在 Vercel 环境中
+if os.getenv('VERCEL'):
+    # 在 Vercel 环境中初始化应用
+    init_app_for_vercel()
 
 if __name__ == '__main__':
     with app.app_context():
