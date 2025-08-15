@@ -1,4 +1,3 @@
-from flask import Flask
 from flask import Flask, render_template, redirect, jsonify, request, Response, url_for, flash, session, send_file
 from models import db, ContactsOld, ContactsNew, RentalOld, RentalNew, RentalRecordsOld, RentalRecordsNew, RoomsNew, \
     RoomsOld, RentalInfoOld, RentalInfoNew, ContractsOld, ContractsNew, Admin
@@ -6,16 +5,7 @@ from datetime import datetime, timedelta
 from io import StringIO, BytesIO
 import zipfile
 import os
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-from reportlab.lib.units import inch
-from reportlab.pdfbase import pdfmetrics
-from reportlab.pdfbase.ttfonts import TTFont
-from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
-from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
-from reportlab.lib import colors
-from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
-from reportlab.pdfbase.cidfonts import UnicodeCIDFont
+# ReportLab imports moved to function level to avoid initialization issues
 from sqlalchemy import extract, and_
 
 app = Flask(__name__)
@@ -3004,6 +2994,9 @@ def api_delete_admin(admin_id):
 
 # Vercel部署需要的应用实例
 app_instance = app
+
+# 在Vercel环境中初始化数据库
+init_database()
 
 if __name__ == '__main__':
     with app.app_context():
