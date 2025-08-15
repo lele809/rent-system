@@ -21,28 +21,32 @@ try:
     from models import db
     
     # 配置应用
-    app.config.from_object('config.Config')
-    db.init_app(app)
-    
-    # 延迟导入路由，避免循环导入
-    with app.app_context():
-        try:
-            # 导入所有路由
-            import app as full_app_module
-            # 复制路由到当前应用
-            for rule in full_app_module.app.url_map.iter_rules():
-                if rule.endpoint != 'static':
-                    app.add_url_rule(
-                        rule.rule,
-                        rule.endpoint,
-                        full_app_module.app.view_functions[rule.endpoint],
-                        methods=rule.methods
-                    )
-            full_app_loaded = True
-            print("Successfully loaded full rental management system")
-        except Exception as route_error:
-            print(f"Failed to load routes: {route_error}")
-            import_error = route_error
+     app.config.from_object('config.Config')
+     db.init_app(app)
+     
+     # 延迟导入路由，避免循环导入
+     with app.app_context():
+         try:
+             # 初始化数据库表
+             db.create_all()
+             print("Database tables created successfully")
+             
+             # 导入所有路由
+             import app as full_app_module
+             # 复制路由到当前应用
+             for rule in full_app_module.app.url_map.iter_rules():
+                 if rule.endpoint != 'static':
+                     app.add_url_rule(
+                         rule.rule,
+                         rule.endpoint,
+                         full_app_module.app.view_functions[rule.endpoint],
+                         methods=rule.methods
+                     )
+             full_app_loaded = True
+             print("Successfully loaded full rental management system")
+         except Exception as route_error:
+             print(f"Failed to load routes: {route_error}")
+             import_error = route_error
             
 except Exception as e:
     print(f"Failed to import full app: {e}")
