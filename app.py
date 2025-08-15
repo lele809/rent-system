@@ -3004,21 +3004,8 @@ def api_delete_admin(admin_id):
 # Vercel部署需要的应用实例
 app_instance = app
 
-# 数据库初始化标志
-_db_initialized = False
-
-# 延迟初始化数据库，只在需要时初始化
-@app.before_request
-def initialize_database():
-    """在请求前检查并初始化数据库"""
-    global _db_initialized
-    if not _db_initialized:
-        try:
-            db.create_all()
-            print("数据库初始化成功")
-            _db_initialized = True
-        except Exception as e:
-            print(f"数据库初始化失败: {e}")
+# 在Vercel环境中初始化数据库
+init_database()
 
 if __name__ == '__main__':
     with app.app_context():
