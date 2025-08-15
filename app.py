@@ -5,7 +5,16 @@ from datetime import datetime, timedelta
 from io import StringIO, BytesIO
 import zipfile
 import os
-# ReportLab imports moved to function level to avoid initialization issues
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.pdfbase import pdfmetrics
+from reportlab.pdfbase.ttfonts import TTFont
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+from reportlab.lib import colors
+from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT
+from reportlab.pdfbase.cidfonts import UnicodeCIDFont
 from sqlalchemy import extract, and_
 
 app = Flask(__name__)
@@ -2995,8 +3004,21 @@ def api_delete_admin(admin_id):
 # Vercel部署需要的应用实例
 app_instance = app
 
-# 在Vercel环境中初始化数据库
-init_database()
+# 数据库初始化标志
+_db_initialized = False
+
+# 延迟初始化数据库，只在需要时初始化
+@app.before_request
+def initialize_database():
+    """在请求前检查并初始化数据库"""
+    global _db_initialized
+    if not _db_initialized:
+        try:
+            db.create_all()
+            print("数据库初始化成功")
+            _db_initialized = True
+        except Exception as e:
+            print(f"数据库初始化失败: {e}")
 
 if __name__ == '__main__':
     with app.app_context():
