@@ -23,6 +23,15 @@ app.config.from_object('config.Config')
 
 db.init_app(app)
 
+# 在应用启动时初始化数据库
+try:
+    with app.app_context():
+        db.create_all()
+        print("数据库初始化成功")
+except Exception as e:
+    print(f"数据库初始化失败: {e}")
+    # 在生产环境中，我们继续运行应用，但会记录错误
+
 
 # 全局上下文处理器 - 使所有模板都能访问当前管理员信息
 @app.context_processor
