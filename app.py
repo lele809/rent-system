@@ -23,14 +23,33 @@ app.config.from_object('config.Config')
 
 db.init_app(app)
 
-# 在应用启动时初始化数据库
-try:
-    with app.app_context():
-        db.create_all()
-        print("数据库初始化成功")
-except Exception as e:
-    print(f"数据库初始化失败: {e}")
-    # 在生产环境中，我们继续运行应用，但会记录错误
+# 数据库初始化函数
+def init_database():
+    """初始化数据库"""
+    try:
+        with app.app_context():
+            db.create_all()
+            print("数据库初始化成功")
+            return True
+    except Exception as e:
+        print(f"数据库初始化失败: {e}")
+        return False
+
+# 确保数据库已初始化的装饰器
+def ensure_db_initialized(f):
+    """确保数据库已初始化的装饰器"""
+    def decorated_function(*args, **kwargs):
+        try:
+            # 尝试执行一个简单的数据库查询来检查连接
+            with app.app_context():
+                from sqlalchemy import text
+                db.session.execute(text('SELECT 1'))
+        except:
+            # 如果失败，尝试初始化数据库
+            init_database()
+        return f(*args, **kwargs)
+    decorated_function.__name__ = f.__name__
+    return decorated_function
 
 
 # 全局上下文处理器 - 使所有模板都能访问当前管理员信息
@@ -115,6 +134,7 @@ def get_todo_items(floor='old'):
 
 
 @app.route('/login', methods=['GET', 'POST'])
+@ensure_db_initialized
 def login():
     """登录页面和处理"""
     if request.method == 'POST':
@@ -154,6 +174,7 @@ def logout():
 
 
 @app.route('/')
+@ensure_db_initialized
 def home():
     """首页重定向到登录页面"""
     if 'admin_id' in session:
@@ -2983,6 +3004,9 @@ def api_delete_admin(admin_id):
 
 # Vercel部署需要的应用实例
 app_instance = app
+
+# 在Vercel环境中初始化数据库
+init_database()
 
 if __name__ == '__main__':
     with app.app_context():
