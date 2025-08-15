@@ -5,18 +5,17 @@ load_dotenv()
 
 
 class Config:
-    SECRET_KEY = os.getenv('SECRET_KEY', 'secret_key')
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here')
 
-    # MySQL数据库配置
-    MYSQL_HOST = os.getenv('MYSQL_HOST', 'localhost')
-    MYSQL_PORT = os.getenv('MYSQL_PORT', '3306')
-    MYSQL_USER = os.getenv('MYSQL_USER', 'root')
-    MYSQL_PASSWORD = os.getenv('MYSQL_PASSWORD', '123456')
-    MYSQL_DATABASE = os.getenv('MYSQL_DATABASE', 'rent_system')
-
-    # 构建MySQL连接字符串
-    SQLALCHEMY_DATABASE_URI = os.getenv('DATABASE_URL',
-                                        f'mysql+pymysql://{MYSQL_USER}:{MYSQL_PASSWORD}@{MYSQL_HOST}:{MYSQL_PORT}/{MYSQL_DATABASE}?charset=utf8mb4')
+    # 数据库配置 - 优先使用环境变量中的DATABASE_URL
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    
+    if DATABASE_URL:
+        # 如果有DATABASE_URL环境变量，直接使用
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    else:
+        # 否则使用SQLite作为备用数据库
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///rental_system.db'
 
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     PER_PAGE = 10
