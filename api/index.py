@@ -1,10 +1,25 @@
-import sys
 import os
 
-# 添加项目根目录到Python路径
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+try:
+    from dotenv import load_dotenv
+    load_dotenv()
+except ImportError:
+    # 在Vercel环境中可能没有python-dotenv
+    pass
 
-from app import app
 
-# Vercel需要的应用入口点
-app = app
+class Config:
+    SECRET_KEY = os.getenv('SECRET_KEY', 'your-secret-key-here-vercel-deployment')
+
+    # 数据库配置 - 优先使用环境变量中的DATABASE_URL
+    DATABASE_URL = os.getenv('DATABASE_URL')
+    
+    if DATABASE_URL:
+        # 如果有DATABASE_URL环境变量，直接使用
+        SQLALCHEMY_DATABASE_URI = DATABASE_URL
+    else:
+        # 在serverless环境中使用内存数据库
+        SQLALCHEMY_DATABASE_URI = 'sqlite:///:memory:'
+
+    SQLALCHEMY_TRACK_MODIFICATIONS = False
+    PER_PAGE = 10
