@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime, timezone
+from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 
 db = SQLAlchemy()
@@ -13,7 +13,7 @@ class ContactsOld(db.Model):
     roomId = db.Column(db.String(20), nullable=False, comment='房间ID')
     phone = db.Column(db.String(20), nullable=False, comment='电话')
     id_card = db.Column(db.String(18), nullable=False, comment='身份证号')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
 
 
 class ContactsNew(db.Model):
@@ -24,7 +24,7 @@ class ContactsNew(db.Model):
     roomId = db.Column(db.String(20), nullable=False, comment='房间ID')
     phone = db.Column(db.String(20), nullable=False, comment='电话')
     id_card = db.Column(db.String(18), nullable=False, comment='身份证号')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
 
 
 class RentalOld(db.Model):
@@ -47,9 +47,8 @@ class RentalOld(db.Model):
     contract_start_date = db.Column(db.Date, nullable=True, comment='合同开始时间')
     contract_end_date = db.Column(db.Date, nullable=True, comment='合同结束时间')
     remarks = db.Column(db.Text, nullable=True, comment='备注')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, onupdate=datetime.utcnow, comment='更新时间')
 
 
 class RentalNew(db.Model):
@@ -72,9 +71,8 @@ class RentalNew(db.Model):
     contract_start_date = db.Column(db.Date, nullable=True, comment='合同开始时间')
     contract_end_date = db.Column(db.Date, nullable=True, comment='合同结束时间')
     remarks = db.Column(db.Text, nullable=True, comment='备注')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, onupdate=datetime.utcnow, comment='更新时间')
 
 
 class RentalRecordsOld(db.Model):
@@ -85,7 +83,7 @@ class RentalRecordsOld(db.Model):
     tenant_name = db.Column(db.String(50), nullable=False, comment='租客姓名')
     total_rent = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='总租金')
     payment_date = db.Column(db.Date, nullable=True, comment='缴费日期')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
 
 
 class RentalRecordsNew(db.Model):
@@ -96,7 +94,7 @@ class RentalRecordsNew(db.Model):
     tenant_name = db.Column(db.String(50), nullable=False, comment='租客姓名')
     total_rent = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='总租金')
     payment_date = db.Column(db.Date, nullable=True, comment='缴费日期')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
 
 
 class RoomsNew(db.Model):
@@ -107,13 +105,11 @@ class RoomsNew(db.Model):
     room_type = db.Column(db.String(50), nullable=False, comment='房型')
     deposit = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='押金')
     base_rent = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='基础租金')
-    room_status = db.Column(db.SmallInteger, nullable=False, default=1,
-                            comment='房间状态：1=空闲, 2=已出租, 3=维修中, 4=停用')
+    room_status = db.Column(db.SmallInteger, nullable=False, default=1, comment='房间状态：1=空闲, 2=已出租, 3=维修中, 4=停用')
     water_meter_number = db.Column(db.String(50), nullable=False, comment='水表编号')
     electricity_meter_number = db.Column(db.String(50), nullable=False, comment='电表编号')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, onupdate=datetime.utcnow, comment='更新时间')
 
 
 class RoomsOld(db.Model):
@@ -124,13 +120,11 @@ class RoomsOld(db.Model):
     room_type = db.Column(db.String(50), nullable=False, comment='房型')
     deposit = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='押金')
     base_rent = db.Column(db.Numeric(10, 2), nullable=False, default=0.00, comment='基础租金')
-    room_status = db.Column(db.SmallInteger, nullable=False, default=1,
-                            comment='房间状态：1=空闲, 2=已出租, 3=维修中, 4=停用')
+    room_status = db.Column(db.SmallInteger, nullable=False, default=1, comment='房间状态：1=空闲, 2=已出租, 3=维修中, 4=停用')
     water_meter_number = db.Column(db.String(50), nullable=False, comment='水表编号')
     electricity_meter_number = db.Column(db.String(50), nullable=False, comment='电表编号')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc),
-                           onupdate=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, onupdate=datetime.utcnow, comment='更新时间')
 
 
 class ContractsNew(db.Model):
@@ -152,15 +146,14 @@ class ContractsNew(db.Model):
     payment_method = db.Column(db.String(50), nullable=False, comment='缴费方式')
     rent_due_date = db.Column(db.Date, nullable=True, comment='租金到期日')
     contract_status = db.Column(db.SmallInteger, nullable=False, default=1, comment='合同状态：1=有效, 2=失效')
-    utilities_included = db.Column(db.SmallInteger, nullable=False, default=1,
-                                   comment='是否包含水电费：1=包含, 2=不包含')
+    utilities_included = db.Column(db.SmallInteger, nullable=False, default=1, comment='是否包含水电费：1=包含, 2=不包含')
     water_rate = db.Column(db.Numeric(6, 2), nullable=False, default=0.00, comment='水费单价')
     electricity_rate = db.Column(db.Numeric(6, 2), nullable=False, default=0.00, comment='电费单价')
     contract_terms = db.Column(db.Text, nullable=True, comment='合同条款')
     special_agreement = db.Column(db.Text, nullable=True, comment='特殊约定')
     remarks = db.Column(db.Text, nullable=True, comment='备注')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='更新时间')
 
 
 class Admin(db.Model):
@@ -172,11 +165,11 @@ class Admin(db.Model):
     last_login = db.Column(db.DateTime, nullable=True, comment='最后登录时间')
 
     def set_password(self, password):
-        """设置密码哈希"""
+        """设置密码"""
         self.password = generate_password_hash(password)
 
     def check_password(self, password):
-        """验证密码"""
+        """检查密码"""
         return check_password_hash(self.password, password)
 
 
@@ -199,15 +192,14 @@ class ContractsOld(db.Model):
     payment_method = db.Column(db.String(50), nullable=False, comment='缴费方式')
     rent_due_date = db.Column(db.Date, nullable=True, comment='租金到期日')
     contract_status = db.Column(db.SmallInteger, nullable=False, default=1, comment='合同状态：1=有效, 2=失效')
-    utilities_included = db.Column(db.SmallInteger, nullable=False, default=1,
-                                   comment='是否包含水电费：1=包含, 2=不包含')
+    utilities_included = db.Column(db.SmallInteger, nullable=False, default=1, comment='是否包含水电费：1=包含, 2=不包含')
     water_rate = db.Column(db.Numeric(6, 2), nullable=False, default=0.00, comment='水费单价')
     electricity_rate = db.Column(db.Numeric(6, 2), nullable=False, default=0.00, comment='电费单价')
     contract_terms = db.Column(db.Text, nullable=True, comment='合同条款')
     special_agreement = db.Column(db.Text, nullable=True, comment='特殊约定')
     remarks = db.Column(db.Text, nullable=True, comment='备注')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='更新时间')
 
 
 class RentalInfoOld(db.Model):
@@ -222,8 +214,8 @@ class RentalInfoOld(db.Model):
     check_in_date = db.Column(db.Date, nullable=True, comment='入住时间')
     rental_status = db.Column(db.SmallInteger, nullable=False, default=1, comment='租赁状态：1=已缴费, 2=未缴费')
     remarks = db.Column(db.Text, nullable=True, comment='备注')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='更新时间')
 
 
 class RentalInfoNew(db.Model):
@@ -238,5 +230,5 @@ class RentalInfoNew(db.Model):
     check_in_date = db.Column(db.Date, nullable=True, comment='入住时间')
     rental_status = db.Column(db.SmallInteger, nullable=False, default=1, comment='租赁状态：1=已缴费, 2=未缴费')
     remarks = db.Column(db.Text, nullable=True, comment='备注')
-    created_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='创建时间')
-    updated_at = db.Column(db.DateTime, nullable=True, default=lambda: datetime.now(timezone.utc), comment='更新时间')
+    created_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='创建时间')
+    updated_at = db.Column(db.DateTime, nullable=True, default=datetime.utcnow, comment='更新时间')
