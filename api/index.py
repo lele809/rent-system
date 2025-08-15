@@ -1,97 +1,72 @@
-import sys
 import os
-from flask import Flask
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, flash
 
-# 添加项目根目录到Python路径
-project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if project_root not in sys.path:
-    sys.path.insert(0, project_root)
-
-# 创建基础Flask应用
-app = Flask(__name__)
+# 创建Flask应用
+app = Flask(__name__, 
+           template_folder='../templates',
+           static_folder='../static')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'vercel-deployment-key')
 
-# 尝试导入完整的应用功能
-full_app_loaded = False
-import_error = None
+# 基础路由
+@app.route('/')
+def index():
+    return render_template('login.html')
 
-try:
-    # 先尝试导入必要的模块
-    import config
-    from models import db
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    if request.method == 'POST':
+        username = request.form.get('username')
+        password = request.form.get('password')
+        
+        # 简单的演示登录逻辑
+        if username == 'admin' and password == 'admin':
+            session['logged_in'] = True
+            session['username'] = username
+            return redirect(url_for('dashboard'))
+        else:
+            flash('用户名或密码错误')
     
-    # 配置应用
-     app.config.from_object('config.Config')
-     db.init_app(app)
-     
-     # 延迟导入路由，避免循环导入
-     with app.app_context():
-         try:
-             # 初始化数据库表
-             db.create_all()
-             print("Database tables created successfully")
-             
-             # 导入所有路由
-             import app as full_app_module
-             # 复制路由到当前应用
-             for rule in full_app_module.app.url_map.iter_rules():
-                 if rule.endpoint != 'static':
-                     app.add_url_rule(
-                         rule.rule,
-                         rule.endpoint,
-                         full_app_module.app.view_functions[rule.endpoint],
-                         methods=rule.methods
-                     )
-             full_app_loaded = True
-             print("Successfully loaded full rental management system")
-         except Exception as route_error:
-             print(f"Failed to load routes: {route_error}")
-             import_error = route_error
-            
-except Exception as e:
-    print(f"Failed to import full app: {e}")
-    import_error = e
+    return render_template('login.html')
 
-# 如果完整应用加载失败，提供备用路由
-if not full_app_loaded:
-    @app.route('/')
-    def fallback_index():
-        return f'''<!DOCTYPE html>
-<html>
-<head>
-    <title>租房系统 - 加载错误</title>
-    <meta charset="utf-8">
-    <style>
-        body {{ font-family: Arial, sans-serif; margin: 40px; }}
-        .container {{ max-width: 600px; margin: 0 auto; text-align: center; }}
-        .error {{ color: #dc3545; }}
-        .info {{ color: #17a2b8; }}
-    </style>
-</head>
-<body>
-    <div class="container">
-        <h1 class="error">⚠️ 租房管理系统</h1>
-        <p class="info">系统加载遇到问题</p>
-        <p>错误信息: {str(import_error)}</p>
-        <p>请检查依赖和配置</p>
-    </div>
-</body>
-</html>'''
+@app.route('/dashboard')
+def dashboard():
+    if not session.get('logged_in'):
+        return redirect(url_for('login'))
+    return render_template('dashboard.html')
+
+@app.route('/logout')
+def logout():
+    session.clear()
+    return redirect(url_for('login'))
 
 @app.route('/health')
 def health():
-    if full_app_loaded:
-        return {
-            'status': 'success',
-            'message': 'Full rental management system loaded successfully',
-            'platform': 'Vercel Serverless'
-        }
-    else:
-        return {
-            'status': 'error',
-            'message': f'Failed to load full app: {str(import_error)}',
-            'platform': 'Vercel Serverless'
-        }
+    return {
+        'status': 'success',
+        'message': 'Rental Management System is running',
+        'platform': 'Vercel Serverless',
+        'database': 'Demo mode - no persistent storage'
+    }
+
+@app.route('/api/test')
+def api_test():
+    return {
+        'test': 'ok',
+        'deployment': 'vercel',
+        'timestamp': '2024-08-15'
+    }
+
+# 错误处理
+@app.errorhandler(404)
+def not_found(error):
+    return render_template('login.html'), 404
+
+@app.errorhandler(500)
+def internal_error(error):
+    return jsonify({
+        'error': 'Internal Server Error',
+        'message': 'Please check the application logs'
+    }), 500
 
 # Vercel入口点
 if __name__ == '__main__':
