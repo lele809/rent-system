@@ -3005,9 +3005,6 @@ def api_delete_admin(admin_id):
 # Vercel部署需要的应用实例
 app_instance = app
 
-# 在Vercel环境中初始化数据库
-init_database()
-
 if __name__ == '__main__':
     with app.app_context():
         try:
